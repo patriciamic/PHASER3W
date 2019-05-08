@@ -1,13 +1,11 @@
-// create a new scene named "Game"
 let gameScene = new Phaser.Scene('Game');
 
-// our game's configuration
 let config = {
     mode: Phaser.Scale.FIT,
     type: Phaser.AUTO, //Phaser will decide how to render our game (WebGL or Canvas)
     width: window.innerWidth,
     height: window.innerHeight + 5,
-    scene: gameScene, // our newly created scene
+    scene: gameScene,
     physics: {
         default: 'arcade',
         arcade: {
@@ -35,19 +33,10 @@ let leftButton;
 let rightButton;
 let upButton;
 
-
-
-let moveLeft = false;
-let moveRight = false;
-let moveUp = false;
-
 gameScene.preload = function() {
 
     this.load.image('background', 'assets/bg.jpg');
     this.load.spritesheet('ground', 'assets/platform.png', { frameWidth: config.height - (98 * config.height / 100), frameHeight: config.height - (98 * config.height / 100) });
-    this.load.spritesheet('leftButton', 'assets/LEFT.png', { frameWidth: config.height - (80 * config.height / 100), frameHeight: config.height - (80 * config.height / 100) });
-    this.load.spritesheet('rightButton', 'assets/RIGHT.png', { frameWidth: config.height - (85 * config.height / 100), frameHeight: config.height - (85 * config.height / 100) });
-    this.load.spritesheet('upButton', 'assets/UP.png', { frameWidth: config.height - (85 * config.height / 100), frameHeight: config.height - (85 * config.height / 100) });
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
@@ -60,15 +49,11 @@ gameScene.create = function() {
     bg.displayWidth = config.width;
     bg.displayHeight = config.height;
 
-    // window.addEventListener('resize', () => {
-    //     this.resize(window.innerWidth, window.innerHeight);
-    // });
-
     platforms = this.physics.add.staticGroup();
 
     createPlatform(0, config.width, getPercentFromFrameDimension(95, config.height), 'ground');
 
-    for (let i = getPercentFromFrameDimension(80, config.height); i <= config.height; i += 5) {
+    for (let i = getPercentFromFrameDimension(90, config.height); i <= config.height; i += 5) {
         createPlatform(0, config.width, i, 'ground');
     }
 
@@ -99,7 +84,6 @@ gameScene.create = function() {
         repeat: -1
     });
 
-
     cursors = this.input.keyboard.createCursorKeys();
 
     stars = this.physics.add.group({
@@ -121,11 +105,10 @@ gameScene.create = function() {
     });
 
     scoreText = this.add.text(getPercentFromFrameDimension(2, config.width), getPercentFromFrameDimension(2, config.height), 'score: 0', { fontSize: getPercentFromFrameDimension(3, config.width) + 'px', fill: '#FFF' });
-    gameText = this.add.text(getPercentFromFrameDimension(37, config.width), getPercentFromFrameDimension(85, config.height), ' ', { fontSize: getPercentFromFrameDimension(5, config.width) + 'px', fill: '#000' })
+    gameText = this.add.text(getPercentFromFrameDimension(40, config.width), getPercentFromFrameDimension(10, config.height), ' ', { fontSize: getPercentFromFrameDimension(2, config.width) + 'px', fill: '#FFF' })
         .setInteractive()
         .on('pointerdown', () => {
             console.log("pointerdown");
-            enterButtonActiveStateTryAgain()
         })
         .on('pointerover', () => { console.log("pointerover"); })
         .on('pointerout', () => { console.log("pointerout"); });
@@ -137,135 +120,12 @@ gameScene.create = function() {
     this.physics.add.overlap(player, stars, collectStar, null, this);
     this.physics.add.collider(player, bombs, hitBomb, null, this);
 
-    leftButton = this.add.sprite(getPercentFromFrameDimension(5, config.width), getPercentFromFrameDimension(90, config.height), 'leftButton')
-        .setInteractive()
-        .on('pointerover', () => enterButtonHoverState())
-        .on('pointerout', () => enterButtonRestStateLeft())
-        .on('pointerdown', () => enterButtonActiveStateLeft())
-        .on('pointerup', () => {
-            enterButtonHoverState();
-        });
-
-
-    rightButton = this.add.sprite(getPercentFromFrameDimension(15, config.width), getPercentFromFrameDimension(90, config.height), 'rightButton')
-        .setInteractive()
-        .on('pointerover', () => enterButtonHoverStateRight())
-        .on('pointerout', () => enterButtonRestStateRight())
-        .on('pointerdown', () => enterButtonActiveStateRight())
-        .on('pointerup', () => {
-            enterButtonHoverState();
-        });
-
-    upButton = this.add.sprite(getPercentFromFrameDimension(92, config.width), getPercentFromFrameDimension(90, config.height), 'upButton')
-        .setInteractive()
-        .on('pointerover', () => enterButtonHoverStateUp())
-        .on('pointerout', () => enterButtonRestStateUp())
-        .on('pointerdown', () => enterButtonActiveStateUp())
-        .on('pointerup', () => {
-            enterButtonHoverState();
-        });
-
-
-
 }
-
-function enterButtonHoverState() {
-    console.log("button hover");
-}
-
-function enterButtonHoverStateUp() {
-    console.log("button hover");
-    moveUp = true;
-}
-
-function enterButtonHoverStateRight() {
-    console.log("button hover");
-    moveRight = true;
-}
-
-
-function enterButtonRestStateLeft() {
-    console.log("button rest");
-    moveLeft = false;
-    // moveRight = false;
-}
-
-function enterButtonActiveStateLeft() {
-    console.log("button active");
-    moveLeft = true;
-    //  moveRight = false;
-
-}
-
-
-function enterButtonRestStateRight() {
-    console.log("button rest");
-    moveRight = false;
-    moveLeft = false;
-}
-
-function enterButtonActiveStateRight() {
-    console.log("button active");
-    moveRight = true;
-    //moveLeft = false;
-}
-
-function enterButtonRestStateUp() {
-    console.log("button rest");
-    moveRight = false;
-    moveLeft = false;
-    moveUp = false;
-}
-
-function enterButtonActiveStateUp() {
-    console.log("button active");
-    // moveRight = false;
-    // moveLeft = false;
-    moveUp = true;
-}
-
-function enterButtonActiveStateTryAgain() {
-    console.log("1 destroy");
-
-    gameScene.restart();
-    gameScene.preload();
-    gameScene.create();
-    gameScene.update();
-    console.log(" 2destroy");
-}
-
 
 gameScene.update = function() {
     if (gameOver) {
         return;
     }
-
-    //console.log("Left: " + moveLeft + " Right: " + moveRight + " Up: " + moveUp);
-
-    if (moveRight) {
-        player.setVelocityX(200);
-        player.anims.play('right', true)
-            // moveRight = false;
-    } else
-    if (moveUp) {
-        player.setVelocityY(-400);
-        moveUp = false;
-    } else
-    if (moveLeft) {
-        player.setVelocityX(-200);
-
-        player.anims.play('left', true);
-        if (moveUp) {
-            player.setVelocityY(-400);
-        }
-
-    } else
-    //{
-    //     player.setVelocityX(0);
-
-    //     player.anims.play('turn');
-    // }
-
     if (cursors.left.isDown) {
         player.setVelocityX(-200);
 
@@ -284,8 +144,6 @@ gameScene.update = function() {
         player.setVelocityY(-400);
     }
 }
-
-
 
 
 function collectStar(player, star) {
@@ -328,7 +186,7 @@ function hitBomb(player, bomb) {
     player.setTint(0xff0000);
     player.anims.play('turn');
     gameOver = true;
-    gameText.setText('Try Again');
+    gameText.setText('Game over. Try Again!');
 }
 
 
@@ -345,11 +203,8 @@ function getPercentFromFrameDimension(percent, source) {
 
 
 gameScene.restart = function() {
-
     this.registry.destroy();
     this.events.off();
     this.scene.restart();
-    // gameScene.preload();
-    // gameScene.create();
     console.log("destroy");
 }
